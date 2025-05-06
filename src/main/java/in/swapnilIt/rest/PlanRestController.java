@@ -15,15 +15,35 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import in.swapnilIt.entity.Plan;
+import in.swapnilIt.props.AppProperties;
 import in.swapnilIt.service.PlanService;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @RestController
 public class PlanRestController {
 
-	@Autowired
+	/*
+	 * Fieled Injection
+	 * 
+	 * @Autowired private PlanService planService;
+	 */
+
+	/*
+	 * @Autowired private AppProperties appProps;
+	 */
+
 	private PlanService planService;
 
+	//we use this global variables in all the methods
+	private Map<String, String> messages;
+
+	public PlanRestController(PlanService planService, AppProperties appProps) {
+
+		this.planService = planService;
+		this.messages = appProps.getMessages();
+	}
+
+//every time we created the map at  method level..to remove it we will create map at class level
 	@GetMapping("/categories")
 	public ResponseEntity<Map<Integer, String>> planCategories() {
 
@@ -38,94 +58,112 @@ public class PlanRestController {
 
 		String responseMsg = "";
 		boolean isSaved = planService.savePlan(plan);
-
+		
+		/*
+		 * duplicate code Map<String, String> messages = appProps.getMessages();
+		 */
 		if (isSaved) {
 
-			responseMsg = "Plan Saved";
+			// responseMsg = "Plan Saved";
+			responseMsg = messages.get("planSaveSucc");
 
 		} else {
-			responseMsg = "Plan Not Saved";
+			// responseMsg = "Plan Not Saved";
+			responseMsg = messages.get("planSaveFail");
 		}
 
 		return new ResponseEntity<>(responseMsg, HttpStatus.CREATED);
 
 	}
-	
-	
+
 	@GetMapping("/plans")
-	public ResponseEntity<List<Plan>> plans(){
-		
-		List<Plan> allPlans =planService.getAllPlans();
-		
+	public ResponseEntity<List<Plan>> plans() {
+
+		List<Plan> allPlans = planService.getAllPlans();
+
 		return new ResponseEntity<>(allPlans, HttpStatus.OK);
-		
-		}
-	
-	
-		@GetMapping("plan/{planId}")
-		public ResponseEntity<Plan> editPlan(@PathVariable Integer planId) {
 
-			Plan plan = planService.getPlanById(planId);
+	}
 
-			return new ResponseEntity<>(plan, HttpStatus.OK);
-		}
+	@GetMapping("plan/{planId}")
+	public ResponseEntity<Plan> editPlan(@PathVariable Integer planId) {
 
-		
-		@DeleteMapping("plan/{planId}")
-		public ResponseEntity<String> deletePlan(@PathVariable Integer planId) {
+		Plan plan = planService.getPlanById(planId);
 
-			
-			boolean isDeleted = planService.deletePlanById(planId);
-			String msg = "";
+		return new ResponseEntity<>(plan, HttpStatus.OK);
+	}
 
-			if (isDeleted) {
+	@DeleteMapping("plan/{planId}")
+	public ResponseEntity<String> deletePlan(@PathVariable Integer planId) {
 
-				msg = "PLAN DELETED";
+		boolean isDeleted = planService.deletePlanById(planId);
+		/*
+		 * duplicate code Map<String, String> messages = appProps.getMessages();
+		 */
+		String msg = "";
 
-			} else {
-				msg = "PLAN NOT DELETED";
+		if (isDeleted) {
 
-			}
-			return new ResponseEntity<String>(msg, HttpStatus.OK);
+			// msg = "PLAN DELETED";
 
-		}
+			msg = messages.get("planDeleteSucc");
 
-		@PutMapping("plan/{planId}")
-		public ResponseEntity<String> updatePlan(@RequestBody Plan plan) {
-
-			
-			boolean isUpdated = planService.updatePlan(plan);
-			String msg = "";
-
-			if (isUpdated) {
-
-				msg = "PLAN UPDATED";
-
-			} else {
-				msg = "PLAN NOT UPDATED";
-
-			}
-			return new ResponseEntity<String>(msg, HttpStatus.OK);
+		} else {
+			// msg = "PLAN NOT DELETED";
+			msg = messages.get("planDeleteFail");
 
 		}
-		
-		
-		@PutMapping("/status-change/{planId}/{status}")
-		public ResponseEntity<String> statusChange(@PathVariable Integer planId, @PathVariable String status) {
+		return new ResponseEntity<String>(msg, HttpStatus.OK);
 
-			String msg = "";
+	}
 
-			boolean isStatusChanged = planService.planStatusChange(planId, status);
+	@PutMapping("plan/{planId}")
+	public ResponseEntity<String> updatePlan(@RequestBody Plan plan) {
 
-			if (isStatusChanged) {
-				msg = "Status Changed";
+		boolean isUpdated = planService.updatePlan(plan);
+		/*
+		 * duplicate code Map<String, String> messages = appProps.getMessages();
+		 */
 
-			} else {
+		String msg = "";
 
-				msg = "Status Not Changed";
-			}
+		if (isUpdated) {
 
-			return new ResponseEntity<String>(msg, HttpStatus.OK);
+//msg = "PLAN UPDATED";
+
+			msg = messages.get("planUpdateSucc");
+
+		} else {
+			// msg = "PLAN NOT UPDATED";
+			msg = messages.get("planUpdateFail");
+
 		}
+		return new ResponseEntity<String>(msg, HttpStatus.OK);
+
+	}
+
+	@PutMapping("/status-change/{planId}/{status}")
+	public ResponseEntity<String> statusChange(@PathVariable Integer planId, @PathVariable String status) {
+
+		String msg = "";
+
+		boolean isStatusChanged = planService.planStatusChange(planId, status);
+
+		/*
+		 * duplicate code Map<String, String> messages = appProps.getMessages();
+		 */
+
+		if (isStatusChanged) {
+			// msg = "Status Changed";
+			msg = messages.get("planStatusChange");
+
+		} else {
+
+			// msg = "Status Not Changed";
+			msg = messages.get("planStatusChangeFail");
+		}
+
+		return new ResponseEntity<String>(msg, HttpStatus.OK);
+	}
 
 }

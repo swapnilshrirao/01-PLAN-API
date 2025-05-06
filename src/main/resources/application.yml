@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: 01_PLANS_API
+  datasource:
+    driver-class-name: org.h2.Driver
+    password: swapnil
+    url: jdbc:h2:mem:testdb
+    username: swapnil
+
+plan-api:
+ messages:
+  planSaveSucc: Plan Saved Successfully
+  planSaveFail: plan Save Failed
+  planUpdateSucc: Plan Updated Successfully
+  planUpdateFail: Plan Update Failed
+  planDeleteSucc: Plan Deleted Successfully
+  planDeleteFail: Plan Delete Fail
+  planStatusChange: Plan Status Changed Successfully
+  planStatusChangeFail: Plan Status Change Failed    
